@@ -11,6 +11,7 @@ import { setCookie } from '@gitroom/frontend/components/layout/layout.context';
 import { useT } from '@gitroom/react/translation/get.transation.service.client';
 import { useModals } from '@gitroom/frontend/components/layout/new-modal';
 import { Button } from '@gitroom/react/form/button';
+import { ImportDebugPostModal } from '@gitroom/frontend/components/launches/import-debug-post.modal';
 
 interface Charge {
   id: string;
@@ -272,6 +273,27 @@ export const Subscription = () => {
     </Select>
   );
 };
+const ImportDebugPost = () => {
+  const { openModal } = useModals();
+  const t = useT();
+
+  const handleClick = useCallback(() => {
+    openModal({
+      title: t('import_debug_post', 'Import Debug Post'),
+      children: (close) => <ImportDebugPostModal close={close} />,
+    });
+  }, []);
+
+  return (
+    <div
+      className="px-[10px] rounded-[4px] bg-yellow-600 text-white cursor-pointer whitespace-nowrap"
+      onClick={handleClick}
+    >
+      {t('import_debug_post', 'Import Debug Post')}
+    </div>
+  );
+};
+
 export const Impersonate = () => {
   const fetch = useFetch();
   const [name, setName] = useState('');
@@ -352,16 +374,21 @@ export const Impersonate = () => {
                 {billingEnabled && <ManageBilling />}
               </div>
             ) : (
-              <Input
-                autoComplete="off"
-                placeholder="Write the user details"
-                name="impersonate"
-                disableForm={true}
-                label=""
-                removeError={true}
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
+              <div className="flex items-center gap-[10px]">
+                <div className="flex-1">
+                  <Input
+                    autoComplete="off"
+                    placeholder="Write the user details"
+                    name="impersonate"
+                    disableForm={true}
+                    label=""
+                    removeError={true}
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                  />
+                </div>
+                <ImportDebugPost />
+              </div>
             )}
           </div>
           {!!data?.length && (
