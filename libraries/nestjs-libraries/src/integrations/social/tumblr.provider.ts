@@ -4,7 +4,9 @@ import {
   PostResponse,
   SocialProvider,
 } from '@gitroom/nestjs-libraries/integrations/social/social.integrations.interface';
+import { lookup } from 'mime-types';
 import { makeId } from '@gitroom/nestjs-libraries/services/make.is';
+import sharp from 'sharp';
 import { SocialAbstract } from '@gitroom/nestjs-libraries/integrations/social.abstract';
 import { Integration } from '@prisma/client';
 import { Tool } from '@gitroom/nestjs-libraries/integrations/tool.decorator';
@@ -159,6 +161,28 @@ export class TumblrProvider extends SocialAbstract implements SocialProvider {
         const isVideo =
           (media.path?.indexOf('.mp4') || -1) > -1 || media.type === 'video';
 
+        const response = await fetch(media.path);
+        const buffer = await response.arrayBuffer();
+
+        let width = 500;
+        let height = 500;
+        let mimeType = isVideo ? 'video/mp4' : (lookup(media.path) || 'image/jpeg');
+
+        if (!isVideo) {
+          try {
+            const meta = await sharp(Buffer.from(buffer)).metadata();
+            width = meta.width || 500;
+            height = meta.height || 500;
+          } catch {
+            // Use default 500x500 if metadata fails
+          }
+        }
+
+        const blob = new Blob([buffer], { type: mimeType });
+        const extension = isVideo ? 'mp4' : (mimeType?.split('/')[1] || 'jpg');
+        const filename = `file_${mediaIndex}.${extension}`;
+        mediaFiles.push({ identifier, blob, filename });
+
         if (isVideo) {
           content.push({
             type: 'video',
@@ -172,22 +196,15 @@ export class TumblrProvider extends SocialAbstract implements SocialProvider {
             type: 'image',
             media: [
               {
-                type: 'image/jpeg',
+                type: mimeType,
                 identifier,
-                width: 500,
-                height: 500,
+                width,
+                height,
               },
             ],
           });
         }
 
-        const response = await fetch(media.path);
-        const mimeType = isVideo ? 'video/mp4' : 'image/jpeg';
-        const buffer = await response.arrayBuffer();
-        const blob = new Blob([buffer], { type: mimeType });
-        const extension = isVideo ? '.mp4' : '.jpg';
-        const filename = `file_${mediaIndex}${extension}`;
-        mediaFiles.push({ identifier, blob, filename });
         mediaIndex++;
       }
     }
