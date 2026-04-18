@@ -4,8 +4,8 @@ import { FC } from 'react';
 const Bridge = dynamic(
   () =>
     import(
-      '@gitroom/frontend/components/provider-preview/preview.provider.component'
-    ).then((mod) => mod.ProviderPreviewComponent),
+      './bridge'
+    ).then((mod) => mod.default),
   { ssr: false }
 );
 export const InBridge: FC<{ provider: string }> = ({ provider }) => {
