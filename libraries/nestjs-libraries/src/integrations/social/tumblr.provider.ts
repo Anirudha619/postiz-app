@@ -72,7 +72,7 @@ export class TumblrProvider extends SocialAbstract implements SocialProvider {
 
     return {
       id: `t_${userResponse.response?.user?.name}`,
-      name: primaryBlog?.title || primaryBlog?.name || 'Tumblr',
+      name: userResponse.response?.user?.name || 'Tumblr',
       accessToken: tokenResponse.access_token,
       refreshToken: tokenResponse.refresh_token,
       expiresIn: tokenResponse.expires_in,
@@ -107,7 +107,7 @@ export class TumblrProvider extends SocialAbstract implements SocialProvider {
 
     return {
       id: `t_${userResponse.response?.user?.name}`,
-      name: primaryBlog?.title || primaryBlog?.name || 'Tumblr',
+      name: userResponse.response?.user?.name || 'Tumblr',
       accessToken: tokenResponse.access_token,
       refreshToken: tokenResponse.refresh_token,
       expiresIn: tokenResponse.expires_in,
@@ -116,7 +116,7 @@ export class TumblrProvider extends SocialAbstract implements SocialProvider {
     };
   }
 
-@Tool({ description: 'Blogs', dataSchema: [] })
+  @Tool({ description: 'Blogs', dataSchema: [] })
   async blogs(accessToken: string) {
     const response = await this.fetch('https://api.tumblr.com/v2/user/info', {
       headers: {
@@ -140,7 +140,7 @@ export class TumblrProvider extends SocialAbstract implements SocialProvider {
     integration: Integration,
   ): Promise<PostResponse[]> {
     const [firstPost] = postDetails;
-    const blogName = id.replace('t_', '');
+    const blogName = firstPost.settings?.blog || id.replace('t_', '');
 
     const content: any[] = [
       {
