@@ -39,6 +39,7 @@ import MoltbookProvider from '@gitroom/frontend/components/new-launch/providers/
 import SkoolProvider from '@gitroom/frontend/components/new-launch/providers/skool/skool.provider';
 import WhopProvider from '@gitroom/frontend/components/new-launch/providers/whop/whop.provider';
 import MeweProvider from '@gitroom/frontend/components/new-launch/providers/mewe/mewe.provider';
+import TumblrProvider from '@gitroom/frontend/components/new-launch/providers/tumblr/tumblr.provider';
 
 export const Providers = [
   {
@@ -173,6 +174,10 @@ export const Providers = [
     identifier: 'mewe',
     component: MeweProvider,
   },
+  {
+    identifier: 'tumblr',
+    component: TumblrProvider,
+  },
 ];
 export const ShowAllProviders = forwardRef((props, ref) => {
   const { date, current, global, selectedIntegrations, allIntegrations } =
@@ -183,7 +188,7 @@ export const ShowAllProviders = forwardRef((props, ref) => {
         allIntegrations: state.integrations,
         current: state.current,
         global: state.global,
-      }))
+      })),
     );
 
   const t = useT();
@@ -191,17 +196,17 @@ export const ShowAllProviders = forwardRef((props, ref) => {
   useImperativeHandle(ref, () => ({
     checkAllValid: async () => {
       return Promise.all(
-        selectedIntegrations.map(async (p) => await p.ref?.current.isValid())
+        selectedIntegrations.map(async (p) => await p.ref?.current.isValid()),
       );
     },
     getAllValues: async () => {
       return Promise.all(
-        selectedIntegrations.map(async (p) => await p.ref?.current.getValues())
+        selectedIntegrations.map(async (p) => await p.ref?.current.getValues()),
       );
     },
     triggerAll: () => {
       return selectedIntegrations.map(
-        async (p) => await p.ref?.current.trigger()
+        async (p) => await p.ref?.current.trigger(),
       );
     },
   }));
@@ -226,7 +231,7 @@ export const ShowAllProviders = forwardRef((props, ref) => {
             <div>
               {t(
                 'start_writing_your_post',
-                'Start writing your post for a preview'
+                'Start writing your post for a preview',
               )}
             </div>
           ) : (
@@ -239,7 +244,7 @@ export const ShowAllProviders = forwardRef((props, ref) => {
       {selectedIntegrations.map((integration) => {
         const { component: ProviderComponent } = Providers.find(
           (provider) =>
-            provider.identifier === integration.integration.identifier
+            provider.identifier === integration.integration.identifier,
         ) || {
           component: Empty,
         };
