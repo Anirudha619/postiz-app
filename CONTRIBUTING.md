@@ -8,7 +8,7 @@ The main documentation site has a [developer guide](https://docs.postiz.com/deve
 
 ## Apply via the contribution form
 
-To submit your contribution, please fill out the [contribution form](https://contribute.egelhaus.de/p/postiz). This helps us evaluate whether your contribution is a good fit for the project. We will review your submission and get back to you as soon as possible.
+To submit your contribution, please fill out the [contribution form](https://contribute.postiz.com/p/postiz). This helps us evaluate whether your contribution is a good fit for the project. We will review your submission and get back to you as soon as possible.
 
 ## Write code with others
 
