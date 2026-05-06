@@ -7,18 +7,9 @@ import { IntegrationService } from '@gitroom/nestjs-libraries/database/prisma/in
 import { PostsService } from '@gitroom/nestjs-libraries/database/prisma/posts/posts.service';
 import { makeId } from '@gitroom/nestjs-libraries/services/make.is';
 import { AllProvidersSettings } from '@gitroom/nestjs-libraries/dtos/posts/providers-settings/all.providers.settings';
-import { validate } from 'class-validator';
+import { validatePostContent } from '@gitroom/nestjs-libraries/utils/post-validation.util';
 import { Integration } from '@prisma/client';
 import { checkAuth } from '@gitroom/nestjs-libraries/chat/auth.context';
-import { stripHtmlValidation } from '@gitroom/helpers/utils/strip.html.validation';
-import { weightedLength } from '@gitroom/helpers/utils/count.length';
-
-function countCharacters(text: string, type: string): number {
-  if (type !== 'x') {
-    return text.length;
-  }
-  return weightedLength(text);
-}
 
 @Injectable()
 export class IntegrationSchedulePostTool implements AgentToolInterface {
@@ -138,44 +129,31 @@ If the tools return errors, you would need to rerun it with the right parameters
               platform.integrationId
             );
 
-          const { dto, maxLength, identifier } = socialIntegrationList.find(
+          const provider = socialIntegrationList.find(
             (p) =>
               p.identifier ===
               integrations[platform.integrationId].providerIdentifier
           )!;
 
+          const { dto } = provider;
+
           if (dto) {
-            const newDTO = new dto();
-            const obj = Object.assign(
-              newDTO,
-              platform.settings.reduce(
-                (acc: AllProvidersSettings, s: { key: string; value: any }) => ({
-                  ...acc,
-                  [s.key]: s.value,
-                }),
-                {} as AllProvidersSettings
-              )
-            );
-            const errors = await validate(obj);
-            if (errors.length) {
-              return {
-                errors: JSON.stringify(errors),
-              };
-            }
-
-            const errorsLength = [];
+            const errorsLength: { value: string; error: string }[] = [];
             for (const post of platform.postsAndComments) {
-              const maximumCharacters = maxLength(platform.isPremium);
-              const strip = stripHtmlValidation('normal', post.content, true);
-              const weightedLength = countCharacters(strip, identifier || '');
-              const totalCharacters =
-                weightedLength > strip.length ? weightedLength : strip.length;
+              const settings = platform.settings.map((s: { key: string; value: any }) => ({
+                key: s.key,
+                value: s.value,
+              }));
 
-              if (totalCharacters > (maximumCharacters || 1000000)) {
-                errorsLength.push({
-                  value: post.content,
-                  error: `The maximum characters is ${maximumCharacters}, we got ${totalCharacters}, please fix it, and try integrationSchedulePostTool again.`,
-                });
+              const result = await validatePostContent(
+                provider,
+                post.content,
+                settings,
+                platform.isPremium
+              );
+
+              if (!result.valid) {
+                errorsLength.push(...result.errors);
               }
             }
 
