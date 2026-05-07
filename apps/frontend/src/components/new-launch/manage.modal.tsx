@@ -251,7 +251,7 @@ export const ManageModal: FC<AddEditModalProps> = (props) => {
         return p.values.some((a: any) => {
           return (
             countCharacters(
-              stripHtmlValidation('normal', a.content, true),
+              stripHtmlValidation('normal', a.content, true).trim(),
               p?.integration?.identifier || ''
             ) === 0 && a.media?.length === 0
           );
@@ -306,7 +306,7 @@ export const ManageModal: FC<AddEditModalProps> = (props) => {
 
         const sliceNeeded = checkAllValid.filter((p: any) => {
           return p.values.some((a: any) => {
-            const strip = stripHtmlValidation('normal', a.content, true);
+            const strip = stripHtmlValidation('normal', a.content, true).trim();
             const weightedLength = countCharacters(
               strip,
               p?.integration?.identifier || ''

@@ -36,10 +36,12 @@ export async function validatePostContent(
   const totalCharacters =
     calculatedLength > strip.length ? calculatedLength : strip.length;
 
-  if (totalCharacters > maximumCharacters) {
+  if (totalCharacters > maximumCharacters || strip.trim().length === 0) {
     errors.push({
       value: content,
-      error: `The maximum characters is ${maximumCharacters}, we got ${totalCharacters}`,
+      error: totalCharacters > maximumCharacters
+        ? `The maximum characters is ${maximumCharacters}, we got ${totalCharacters}`
+        : 'Content cannot be empty or whitespace only',
     });
   }
 
