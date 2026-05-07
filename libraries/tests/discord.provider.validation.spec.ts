@@ -68,6 +68,22 @@ describe('Discord Provider Validation', () => {
         outputText: 'Hello 𝗗𝗶𝘀𝗰𝗼𝗿𝗱!',
       },
     },
+    {
+      name: 'Whitespace-only channel',
+      input: {
+        content: 'Hello Discord!',
+        settings: [{ key: 'channel', value: ' ' }],
+      },
+      expected_output: { status: 'fail' },
+    },
+    {
+      name: 'Whitespace-only content',
+      input: {
+        content: '<p>  </p>',
+        settings: [{ key: 'channel', value: '123456789' }],
+      },
+      expected_output: { status: 'fail' },
+    },
   ];
 
   describe.each(testCases)(
